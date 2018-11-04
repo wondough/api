@@ -1,6 +1,7 @@
 package wondough.controllers;
 
 import java.util.*;
+import java.net.*;
 import java.sql.SQLException;
 
 import spark.*;
@@ -115,7 +116,7 @@ public class AuthController {
             // value cannot be read
             response.redirect(
                 getQueryLoginRedirect(request) +
-                "?token=" + config.md5(app.getRequestToken()));
+                "?token=" + URLEncoder.encode(config.md5(app.getRequestToken())));
         }
 
         return ViewUtil.render(request, model, "/velocity/auth.vm");

@@ -7,38 +7,44 @@ import spark.*;
 import sample.*;
 import static sample.SessionUtil.*;
 
+/**
+* Contains route handlers for the sample application.
+* @author The Intern
+*/
 public class IndexController {
-    // Serve the index page (GET request)
+    /** Serve the index page (GET request) */
     public static Route serveIndexPage = (Request request, Response response) -> {
+        // redirect the user to Wondough's authentication page if we don't
+        // have an access token stored in the session
         if(getSessionCurrentUser(request) == null) {
             response.redirect("http://localhost:8000/auth?app=1&target=http://localhost:8080/oauth");
         }
 
         Map<String, Object> model = new HashMap<>();
-
-        //response.header("Access-Control-Allow-Origin", "http://localhost:8000");
-
         return ViewUtil.render(request, model, "/velocity/index.vm");
     };
 
-    // Serve the transaction page (GET request)
+    /** Serve the transaction page (GET request) */
     public static Route serveAddTransactionPage = (Request request, Response response) -> {
+        // redirect the user to Wondough's authentication page if we don't
+        // have an access token stored in the session
         if(getSessionCurrentUser(request) == null) {
             response.redirect("http://localhost:8000/auth?app=1&target=http://localhost:8080/oauth");
         }
 
         Map<String, Object> model = new HashMap<>();
-
-        //response.header("Access-Control-Allow-Origin", "http://localhost:8000");
-
         return ViewUtil.render(request, model, "/velocity/transaction.vm");
     };
 
+    /** Handle the OAuth endpoint for this application */
     public static Route serveOAuthPage = (Request request, Response response) -> {
         Map<String, Object> model = new HashMap<>();
+
+        // exchange the request token for an access token
         String accessToken = exchangeToken(request.queryParams("token"));
 
-        // check that an access token was received
+        // check that an access token was received; redirect back to Wondough's
+        // authentication page
         if(accessToken == null) {
             response.redirect("http://localhost:8000/auth?app=1&target=http://localhost:8080/oauth");
         }
@@ -68,12 +74,11 @@ public class IndexController {
             // write the request token to the request body
             con.setDoOutput(true);
             DataOutputStream out = new DataOutputStream(con.getOutputStream());
-            System.out.println(URLEncoder.encode("token") + "=" + URLEncoder.encode(requestToken));
             out.writeBytes(URLEncoder.encode("token") + "=" + URLEncoder.encode(requestToken));
             out.flush();
             out.close();
 
-            // get the response status code
+            // get the response status code and check that it's OK
             int status = con.getResponseCode();
 
             if(status != 200) {

@@ -52,7 +52,7 @@ public class APIController {
 
             Integer recipient = Program.getInstance().getDbConnection().findUserByName(request.queryParams("recipient"));
 
-            if(user == null) {
+            if(recipient == null) {
                 halt(400, "Not a valid recipient!");
             }
 

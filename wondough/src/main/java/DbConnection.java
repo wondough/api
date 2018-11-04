@@ -8,11 +8,12 @@ import java.sql.*;
 * @version 0.1
 */
 public class DbConnection {
+    /** The database connection to use. */
     private Connection connection;
 
     /**
     * Initialises a new database connection.
-    * @param filename The name of the database file.
+    * @param filename The name of the SQLite database file.
     */
     public DbConnection(String filename) throws SQLException {
         // construct the connection string
@@ -22,6 +23,9 @@ public class DbConnection {
         this.connection = DriverManager.getConnection(url);
     }
 
+    /**
+    * Retrieves the next User ID to use.
+    */
     private int largestUserID() throws SQLException {
         Statement stmt = null;
         String query = "SELECT id FROM users ORDER BY id DESC LIMIT 1;";
@@ -42,6 +46,9 @@ public class DbConnection {
         return 0;
     }
 
+    /**
+    * Retrieves the next request token ID to use.
+    */
     private int largestRequestToken() throws SQLException {
         Statement stmt = null;
         String query = "SELECT requestToken FROM authorised_apps ORDER BY requestToken DESC LIMIT 1;";
@@ -62,6 +69,9 @@ public class DbConnection {
         return 0;
     }
 
+    /**
+    * Retrieves the next access token ID to use.
+    */
     private int largestAccessToken() throws SQLException {
         Statement stmt = null;
         String query = "SELECT accessToken FROM authorised_apps ORDER BY accessToken DESC LIMIT 1;";
@@ -82,12 +92,21 @@ public class DbConnection {
         return 0;
     }
 
+    /**
+    * Inserts the specified user account into the database. This method
+    * assumes that the ID of the user is not set to anything.
+    * @param user The user account to insert.
+    */
     public void createUser(WondoughUser user) throws SQLException {
+        // get the next available ID for this user
         int id = this.largestUserID();
 
+        // create a prepared statement to insert the user account
+        // into the database
         Statement stmt = null;
         String query = "INSERT INTO users (id,username,password,salt,iterations,keySize) VALUES (" + id + ", '" + user.getUsername() + "' , '" + user.getHashedPassword() + "' , '" + user.getSalt() + "' ," + user.getIterations() + "," + user.getKeySize() + ");";
 
+        // try to insert the user into the database
         try {
             stmt = this.connection.createStatement();
             stmt.executeUpdate(query);
@@ -98,6 +117,10 @@ public class DbConnection {
         }
     }
 
+    /**
+    * Looks up a user by their username.
+    * @param username The username to lookup.
+    */
     public WondoughUser getUser(String username) throws SQLException {
         Statement stmt = null;
         String query = "SELECT * FROM users WHERE username='" + username + "' LIMIT 1;";
@@ -178,6 +201,10 @@ public class DbConnection {
         }
     }
 
+    /**
+    * Exchanges a request token for an access token.
+    * @param requestToken The request token to exchange.
+    */
     public String exchangeToken(String requestToken) throws SQLException {
         SecurityConfiguration config = Program.getInstance().getSecurityConfiguration();
         Statement stmt = null;
@@ -203,6 +230,11 @@ public class DbConnection {
         return null;
     }
 
+    /**
+    * Validates whether the specified string is a valid access token and returns
+    * the unique ID of the user it belongs to.
+    * @param accessToken The access token to validate.
+    */
     public Integer isValidAccessToken(String accessToken) throws SQLException {
         SecurityConfiguration config = Program.getInstance().getSecurityConfiguration();
         Statement stmt = null;
@@ -228,6 +260,10 @@ public class DbConnection {
         return null;
     }
 
+    /**
+    * Looks up a user by their username and returns their unique ID.
+    * @param username The username to lookup.
+    */
     public Integer findUserByName(String username) throws SQLException {
         PreparedStatement stmt = null;
         String query = "SELECT id FROM users WHERE username=? LIMIT 1;";
@@ -249,6 +285,13 @@ public class DbConnection {
         return null;
     }
 
+    /**
+    * Creates a new transaction.
+    * @param user The ID of the user sending the money.
+    * @param recipient The ID of the recipient of the money.
+    * @param description The description of the transaction.
+    * @param amount The amount that is being transferred.
+    */
     public boolean createTransaction(int user, int recipient, String description, float amount) throws SQLException {
         // don't allow users to send negative amounts
         if(amount < 0) {
@@ -285,6 +328,10 @@ public class DbConnection {
         }
     }
 
+    /**
+    * Gets all transactions for a user.
+    * @param user The unique ID of the user to look up transactions for.
+    */
     public Transactions getTransactions(int user) throws SQLException {
         PreparedStatement stmt = null;
         String query = "SELECT * FROM transactions WHERE uid=? ORDER BY tid DESC;";
