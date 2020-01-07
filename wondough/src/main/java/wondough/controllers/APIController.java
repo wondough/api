@@ -1,4 +1,4 @@
-package wondough;
+package wondough.controllers;
 
 import java.util.*;
 import java.sql.SQLException;
