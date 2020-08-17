@@ -12,12 +12,22 @@ import static sample.SessionUtil.*;
 * @author The Intern
 */
 public class IndexController {
+    private static void redirectToAuth(Response response) {
+        Program app = Program.getInstance();
+
+        response.redirect(String.format(
+            "http://localhost:%d/auth?app=1&target=http://localhost:%d/oauth", 
+            app.wondoughPort(),
+            app.port()
+        ));
+    };
+
     /** Serve the index page (GET request) */
     public static Route serveIndexPage = (Request request, Response response) -> {
         // redirect the user to Wondough's authentication page if we don't
         // have an access token stored in the session
         if(getSessionCurrentUser(request) == null) {
-            response.redirect("http://localhost:8000/auth?app=1&target=http://localhost:8080/oauth");
+            redirectToAuth(response);
         }
 
         Map<String, Object> model = new HashMap<>();
@@ -29,7 +39,7 @@ public class IndexController {
         // redirect the user to Wondough's authentication page if we don't
         // have an access token stored in the session
         if(getSessionCurrentUser(request) == null) {
-            response.redirect("http://localhost:8000/auth?app=1&target=http://localhost:8080/oauth");
+            redirectToAuth(response);
         }
 
         Map<String, Object> model = new HashMap<>();
@@ -46,7 +56,7 @@ public class IndexController {
         // check that an access token was received; redirect back to Wondough's
         // authentication page
         if(accessToken == null) {
-            response.redirect("http://localhost:8000/auth?app=1&target=http://localhost:8080/oauth");
+            redirectToAuth(response);
         }
 
         // store the access token in the session and make it available to
@@ -56,7 +66,11 @@ public class IndexController {
 
         // redirect back to the front page of the sample application to
         // discard of any remaining query parameters
-        response.redirect("http://localhost:8080/");
+        response.redirect(String.format(
+            "http://localhost:%d/", 
+            Program.getInstance().port()
+        ));
+
         return null;
     };
 
@@ -67,14 +81,17 @@ public class IndexController {
     private static String exchangeToken(String requestToken) {
         try {
             // initialise the HTTP request
-            URL url = new URL("http://localhost:8000/exchange");
+            URL url = new URL(String.format(
+                "http://localhost:%d/exchange", 
+                Program.getInstance().wondoughPort()
+            ));
             HttpURLConnection con = (HttpURLConnection)url.openConnection();
             con.setRequestMethod("POST");
 
             // write the request token to the request body
             con.setDoOutput(true);
             DataOutputStream out = new DataOutputStream(con.getOutputStream());
-            out.writeBytes(URLEncoder.encode("token") + "=" + URLEncoder.encode(requestToken));
+            out.writeBytes(URLEncoder.encode("token", "UTF-8") + "=" + URLEncoder.encode(requestToken, "UTF-8"));
             out.flush();
             out.close();
 
