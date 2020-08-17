@@ -116,7 +116,8 @@ public class AuthController {
             // value cannot be read
             response.redirect(
                 getQueryLoginRedirect(request) +
-                "?token=" + URLEncoder.encode(config.md5(app.getRequestToken())));
+                "?token=" + URLEncoder.encode(config.md5(app.getRequestToken()), "UTF-8")
+            );
         }
 
         return ViewUtil.render(request, model, "/velocity/auth.vm");

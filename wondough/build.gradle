@@ -24,5 +24,4 @@ dependencies {
     compile group: 'org.xerial', name:'sqlite-jdbc', version:'3.8.11.2'
     compile 'com.google.code.gson:gson:2.8.5'
     compile 'commons-codec:commons-codec:1.8'
-    testCompile("junit:junit")
 }
