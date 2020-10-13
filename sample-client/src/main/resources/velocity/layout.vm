@@ -7,6 +7,10 @@
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" charset="utf-8"></script>
     <script src="/sample.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>
+        var apiPort = $apiPort;
+        var ownPort = $ownPort;
+    </script>
 </head>
 <body>
 <header>
@@ -20,7 +24,7 @@
     </div>
 </main>
 <footer>
-    Copyright 2018 Wondough Bank
+    Copyright 2020 Wondough Bank
 </footer>
 </body>
 </html>

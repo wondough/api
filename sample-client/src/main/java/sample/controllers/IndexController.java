@@ -31,6 +31,11 @@ public class IndexController {
         }
 
         Map<String, Object> model = new HashMap<>();
+
+        Program app = Program.getInstance();
+        model.put("apiPort", app.wondoughPort());
+        model.put("ownPort", app.port());
+
         return ViewUtil.render(request, model, "/velocity/index.vm");
     };
 
@@ -43,6 +48,11 @@ public class IndexController {
         }
 
         Map<String, Object> model = new HashMap<>();
+
+        Program app = Program.getInstance();
+        model.put("apiPort", app.wondoughPort());
+        model.put("ownPort", app.port());
+
         return ViewUtil.render(request, model, "/velocity/transaction.vm");
     };
 

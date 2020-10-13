@@ -16,7 +16,7 @@ function getCookie(cname) {
 
 function addTransaction() {
     console.log('add transaction');
-    $.post('http://localhost:8000/transactions/new?token=' + encodeURIComponent(getCookie('accessToken')),
+    $.post('http://localhost:' + apiPort + '/transactions/new?token=' + encodeURIComponent(getCookie('accessToken')),
         {
             recipient: $('#recipient').val(),
             description: $('#description').val(),
@@ -24,7 +24,7 @@ function addTransaction() {
         },
         function(data) {
             if(data) {
-                window.location.replace("http://localhost:8080/");
+                window.location.replace("http://localhost:" + ownPort + "/");
             }
             else {
                 $('#error').text('Unable to add transaction!');
@@ -34,7 +34,7 @@ function addTransaction() {
 }
 
 function listTransactions() {
-    $.getJSON('http://localhost:8000/transactions?token=' + encodeURIComponent(getCookie('accessToken')),
+    $.getJSON('http://localhost:' + apiPort + '/transactions?token=' + encodeURIComponent(getCookie('accessToken')),
         function (data) {
             console.log(data);
             var container = $('#resultContainer');
